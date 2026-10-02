@@ -1,0 +1,97 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore.
+// Publicar: `firebase deploy --only firestore:rules`, o copiar este archivo en
+// Firebase Console → Firestore Database → Reglas → Publicar.
+//
+// Roles (campo `rol` en usuarios/{uid}):
+//   visitante       → ve el contenido, vincula su pulsera, lee su historial y progreso
+//   establecimiento → además registra visitas y canjes en SU lugar (lugarId)
+//   admin           → todo (panel administrativo y lector en cualquier lugar)
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function conSesion() {
+      return request.auth != null;
+    }
+    function rutaPerfil() {
+      return /databases/$(database)/documents/usuarios/$(request.auth.uid);
+    }
+    function rol() {
+      return conSesion() && exists(rutaPerfil()) ? get(rutaPerfil()).data.rol : null;
+    }
+    function esAdmin() {
+      return rol() == 'admin';
+    }
+    function esPersonal() {
+      return rol() in ['establecimiento', 'admin'];
+    }
+    // El lector de un establecimiento solo opera en su propio lugar; el admin en cualquiera.
+    function operaEn(lugarId) {
+      return esAdmin() || (esPersonal() && get(rutaPerfil()).data.get('lugarId', null) == lugarId);
+    }
+    function soloCambian(campos) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
+    }
+
+    // --- Contenido de la feria: lo ve cualquiera, solo el admin lo edita (RF-12) ---
+    match /lugares/{id} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+    match /actividades/{id} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+    match /eventos/{id} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+    match /promociones/{id} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+
+    // --- Usuarios ---
+    match /usuarios/{uid} {
+      allow read: if esPersonal() || (conSesion() && request.auth.uid == uid);
+      // Al registrarse todos son visitantes; el admin cambia roles desde el panel.
+      allow create: if conSesion() && request.auth.uid == uid
+        && request.resource.data.rol == 'visitante'
+        && request.resource.data.keys().hasOnly(['nombre', 'email', 'rol']);
+      allow update: if esAdmin() || (conSesion() && request.auth.uid == uid && soloCambian(['nombre']));
+      allow delete: if esAdmin();
+
+      // Progreso: lo lee el dueño; lo escribe el lector en la transacción de la visita o el canje.
+      match /progreso/{promocionId} {
+        allow read: if esPersonal() || (conSesion() && request.auth.uid == uid);
+        allow write: if esPersonal();
+      }
+    }
+
+    // Estadísticas del panel: el admin consulta el progreso de todos (collection group).
+    match /{ruta=**}/progreso/{promocionId} {
+      allow read: if esAdmin();
+    }
+
+    // --- Pulseras ---
+    match /pulseras/{uidChip} {
+      allow read: if conSesion();
+      allow create, delete: if esAdmin();
+      // El visitante solo puede tomar una pulsera libre y activa, o soltar la suya.
+      allow update: if esAdmin() || (conSesion() && soloCambian(['usuarioId', 'vinculadaEn']) && (
+        (resource.data.usuarioId == null
+          && resource.data.estado == 'activa'
+          && request.resource.data.usuarioId == request.auth.uid)
+        || (resource.data.usuarioId == request.auth.uid
+          && request.resource.data.usuarioId == null)));
+    }
+
+    // --- Historial: el dueño lo lee; solo el lector de ese lugar lo escribe; nadie lo edita ---
+    match /interacciones/{id} {
+      allow read: if esPersonal() || (conSesion() && resource.data.usuarioId == request.auth.uid);
+      allow create: if operaEn(request.resource.data.lugarId);
+      allow update, delete: if esAdmin();
+    }
+  }
+}
