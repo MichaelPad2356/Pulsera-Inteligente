@@ -12,3 +12,6 @@ desktop.ini
 .firebase/
 firebase-debug.log
 firestore-debug.log
+
+# Dependencias
+node_modules/
