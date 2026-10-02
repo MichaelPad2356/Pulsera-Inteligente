@@ -1,12 +1,7 @@
 import { InjectionToken, inject } from '@angular/core';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { Auth, indexedDBLocalPersistence, initializeAuth } from 'firebase/auth';
-import {
-  Firestore,
-  initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
-} from 'firebase/firestore';
+import { Firestore, initializeFirestore, memoryLocalCache } from 'firebase/firestore';
 
 import { environment } from '../../environments/environment';
 
@@ -27,12 +22,10 @@ export const AUTH = new InjectionToken<Auth>('AUTH', {
     initializeAuth(inject(FIREBASE_APP), { persistence: indexedDBLocalPersistence }),
 });
 
-// Caché local persistente: la app abre rápido y sigue mostrando contenido
-// si la señal en la feria es mala. Las transacciones siempre van al servidor.
+// Caché solo en memoria. Con la caché persistente (IndexedDB) la app mostraba datos
+// guardados al recargar, pero a veces tardaba ~25 s en recibir cambios en vivo (RF-10);
+// para la demo importa más que el progreso llegue al instante.
 export const FIRESTORE = new InjectionToken<Firestore>('FIRESTORE', {
   providedIn: 'root',
-  factory: () =>
-    initializeFirestore(inject(FIREBASE_APP), {
-      localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
-    }),
+  factory: () => initializeFirestore(inject(FIREBASE_APP), { localCache: memoryLocalCache() }),
 });

@@ -81,9 +81,11 @@ Tipos en `app-movil/src/app/core/models/` (fuente de verdad, un archivo por enti
 - Publicar (cuando haya CLI): `firebase deploy --only firestore:rules` y `npm run build` + `firebase deploy --only hosting`.
 
 ## Verificado (2026-10-02)
-- Prueba de punta a punta en Chrome (headless) contra Firebase real: 20 pasos OK en 4 de 5 corridas (registro, vincular,
-  5 visitas con aviso en vivo, regla diaria, desbloqueos, canje, historial, flujo Conciertos→Mapa, cercanos, panel).
-  En 1 corrida una actualización en vivo no llegó al visitante (conexión); vigilar en el ensayo.
+- Prueba de punta a punta en Chrome (headless) contra Firebase real: 20 pasos OK (registro, vincular, 5 visitas con
+  aviso en vivo, regla diaria, desbloqueos, canje, historial, flujo Conciertos→Mapa, cercanos, panel).
+- Tiempo real: con la caché persistente de Firestore (IndexedDB, multi-pestaña) a veces el primer cambio tardaba ~26 s
+  tras cargar la página. Se cambió a `memoryLocalCache` (core/firebase.ts): cambios en el mapa y progreso en ~0.1 s.
+  **No volver a activar la caché persistente** sin repetir esa prueba.
 - APK compila con NFC/GPS (permisos en el manifest). **NFC sin probar en hardware** (faltan los stickers).
 
 ## Reparto
