@@ -114,7 +114,7 @@ Tipos en `app-movil/src/app/core/models/` (fuente de verdad, un archivo por enti
 - [ ] Reglas de seguridad de Firestore **antes del 31-oct**
 - [ ] Instalar Firebase CLI
 - [x] `git init` (repo local en esta carpeta)
-- [ ] Primer commit + repositorio en GitHub
+- [x] Primer commit + repositorio en GitHub: https://github.com/MichaelPad2356/Pulsera-Inteligente (público, rama main)
 - [ ] Publicar la PWA en Firebase Hosting (requiere Firebase CLI)
 - [ ] Íconos de la app (PWA y Android) con el logo del equipo; hoy son los de Angular/Capacitor
 - [ ] Cambiar Node global a 24.21 (`nvm use 24.21.0`) y reinstalar globales
