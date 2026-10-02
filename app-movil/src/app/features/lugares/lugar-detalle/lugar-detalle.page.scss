@@ -1,0 +1,17 @@
+ion-chip {
+  margin-left: 0;
+  color: var(--color);
+  border: 1px solid var(--color);
+  background: transparent;
+}
+
+h1 {
+  margin-top: 8px;
+}
+
+.dato {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ion-color-medium);
+}

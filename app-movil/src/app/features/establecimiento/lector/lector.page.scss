@@ -1,0 +1,79 @@
+.lugar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.zona {
+  text-align: center;
+  padding: 32px 16px;
+  margin: 8px 0 16px;
+  border-radius: 16px;
+  border: 2px dashed var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 64px;
+    color: var(--ion-color-medium);
+  }
+
+  h2 {
+    margin: 8px 0 4px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+
+  &.activa {
+    border-color: var(--ion-color-primary);
+
+    ion-icon {
+      color: var(--ion-color-primary);
+      animation: latido 1.5s ease-in-out infinite;
+    }
+  }
+
+  &.alta.activa {
+    border-color: var(--ion-color-tertiary);
+
+    ion-icon {
+      color: var(--ion-color-tertiary);
+    }
+  }
+}
+
+@keyframes latido {
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.nota {
+  text-align: center;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+
+.manual {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+ion-card p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.canje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+}

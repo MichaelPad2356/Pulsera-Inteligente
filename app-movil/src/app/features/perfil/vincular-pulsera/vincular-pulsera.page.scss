@@ -1,0 +1,67 @@
+section {
+  margin-bottom: 28px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.codigo {
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 1.2rem;
+}
+
+.error {
+  text-align: center;
+}
+
+.centro {
+  text-align: center;
+  padding-top: 32px;
+
+  ion-button {
+    margin-top: 12px;
+  }
+}
+
+.grande {
+  font-size: 80px;
+}
+
+// Animación de "esperando la pulsera".
+.onda {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  font-size: 56px;
+  animation: pulso 1.5s ease-out infinite;
+}
+
+@keyframes pulso {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--ion-color-primary-rgb), 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 32px rgba(var(--ion-color-primary-rgb), 0);
+  }
+}

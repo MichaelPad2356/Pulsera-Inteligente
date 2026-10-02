@@ -5,13 +5,52 @@
       <app-boton-perfil />
     </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="seccion()" (ionChange)="seccion.set($any($event.detail.value))">
+      <ion-segment-button value="actividades">
+        <ion-label>Actividades</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pabellones">
+        <ion-label>Pabellones</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Cultura</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <p>Pendiente (semana 2): pabellones culturales y actividades programadas. RF-02.</p>
+<ion-content>
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding"><ion-spinner /></div>
+  } @else if (seccion() === 'actividades') {
+    @for (grupo of dias(); track grupo.dia) {
+      <ion-list>
+        <ion-list-header>{{ grupo.dia | fechaLarga }}</ion-list-header>
+        @for (actividad of grupo.actividades; track actividad.id) {
+          <ion-item [routerLink]="['/tabs/cultura/actividad', actividad.id]" detail>
+            <ion-label>
+              <h2>{{ actividad.nombre }}</h2>
+              <p><ion-icon name="time-outline" /> {{ actividad.hora }} · {{ nombreLugar(actividad.lugarId) }}</p>
+            </ion-label>
+            <app-boton-mapa slot="end" [lugarId]="actividad.lugarId" [compacto]="true" />
+          </ion-item>
+        }
+      </ion-list>
+    } @empty {
+      <app-estado-vacio icono="calendar-outline" mensaje="No hay actividades próximas." />
+    }
+  } @else {
+    <ion-list>
+      @for (pabellon of pabellones(); track pabellon.id) {
+        <ion-item [routerLink]="['/tabs/cultura/lugar', pabellon.id]" detail>
+          <ion-label>
+            <h2>{{ pabellon.nombre }}</h2>
+            <p>{{ pabellon.descripcion }}</p>
+            <p><ion-icon name="time-outline" /> {{ pabellon.horario }}</p>
+          </ion-label>
+          <app-boton-mapa slot="end" [lugarId]="pabellon.id" [compacto]="true" />
+        </ion-item>
+      } @empty {
+        <app-estado-vacio icono="color-palette" mensaje="Aún no hay pabellones registrados." />
+      }
+    </ion-list>
+  }
 </ion-content>

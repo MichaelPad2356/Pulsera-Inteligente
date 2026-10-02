@@ -4,6 +4,45 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 2): correo y contraseña. RF-01.</p>
+<ion-content class="ion-padding">
+  <div class="marca">
+    <ion-icon name="watch-outline" />
+    <h1>Pulsera Inteligente</h1>
+    <p>Tu guía de la feria: cultura, comida, conciertos y promociones.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="entrar()">
+    <ion-input
+      formControlName="email"
+      type="email"
+      label="Correo"
+      labelPlacement="floating"
+      fill="outline"
+      autocomplete="email"
+      inputmode="email"
+    />
+    <ion-input
+      formControlName="password"
+      type="password"
+      label="Contraseña"
+      labelPlacement="floating"
+      fill="outline"
+      autocomplete="current-password"
+    >
+      <ion-input-password-toggle slot="end" />
+    </ion-input>
+
+    @if (error()) {
+      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    }
+
+    <ion-button expand="block" type="submit" [disabled]="enviando()">
+      {{ enviando() ? 'Entrando…' : 'Iniciar sesión' }}
+    </ion-button>
+  </form>
+
+  <p class="cambio">
+    ¿No tienes cuenta?
+    <a routerLink="/auth/registro" [queryParams]="{ volver: volver() }">Regístrate</a>
+  </p>
 </ion-content>

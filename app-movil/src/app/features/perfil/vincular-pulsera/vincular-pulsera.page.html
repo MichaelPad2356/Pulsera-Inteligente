@@ -7,6 +7,78 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 4): acerca la pulsera al teléfono o escribe su código. RF-01, RF-07.</p>
+<ion-content class="ion-padding">
+  @switch (paso()) {
+    @case ('listo') {
+      <div class="centro">
+        <ion-icon name="checkmark-circle" color="success" class="grande" />
+        <h2>{{ mensaje() }}</h2>
+        <p>Pasa tu pulsera en los lectores de los establecimientos para registrar tus visitas.</p>
+        <ion-button expand="block" routerLink="/tabs/conciertos">Explorar la feria</ion-button>
+        <ion-button expand="block" fill="outline" routerLink="/tabs/promociones">Ver promociones</ion-button>
+      </div>
+    }
+    @case ('procesando') {
+      <div class="centro">
+        <ion-spinner />
+        <p>Vinculando tu pulsera…</p>
+      </div>
+    }
+    @case ('escaneando') {
+      <div class="centro">
+        <div class="onda"><ion-icon name="radio-outline" /></div>
+        <h2>Acerca la pulsera</h2>
+        <p>Pégala a la parte de atrás del teléfono, cerca de la cámara.</p>
+        <ion-button fill="clear" (click)="cancelar()">Cancelar</ion-button>
+      </div>
+    }
+    @default {
+      @if (miPulsera(); as pulsera) {
+        <ion-card>
+          <ion-card-content>
+            Ya tienes la pulsera <strong>{{ pulsera.codigo }}</strong>. Si vinculas otra, la anterior quedará libre.
+          </ion-card-content>
+        </ion-card>
+      }
+
+      <!-- Opción 1: acercar la pulsera -->
+      <section>
+        <h2><ion-icon name="radio-outline" /> Acerca tu pulsera</h2>
+        @if (esNativo && estadoNfc() !== 'sin_nfc') {
+          <p>Usa el NFC de tu teléfono para leer la pulsera.</p>
+          <ion-button expand="block" (click)="acercarPulsera()">
+            {{ estadoNfc() === 'apagado' ? 'Activar NFC' : 'Acercar pulsera' }}
+          </ion-button>
+        } @else {
+          <p>
+            Con la pantalla desbloqueada, acerca la pulsera a la parte de atrás de tu teléfono
+            (iPhone XS o más nuevo, o Android con NFC). Se abrirá un enlace que la vincula a tu cuenta.
+          </p>
+        }
+      </section>
+
+      <!-- Opción 2: escribir el código -->
+      <section>
+        <h2><ion-icon name="keypad-outline" /> O escribe el código</h2>
+        <p>Viene impreso en tu pulsera ({{ LARGO_CODIGO }} letras y números).</p>
+        <form (ngSubmit)="vincularConCodigo()">
+          <ion-input
+            [(ngModel)]="codigoEscrito"
+            name="codigo"
+            label="Código de la pulsera"
+            labelPlacement="floating"
+            fill="outline"
+            [maxlength]="LARGO_CODIGO + 2"
+            autocapitalize="characters"
+            class="codigo"
+          />
+          <ion-button expand="block" type="submit" fill="outline">Vincular</ion-button>
+        </form>
+      </section>
+
+      @if (paso() === 'error') {
+        <ion-text color="danger"><p class="error">{{ mensaje() }}</p></ion-text>
+      }
+    }
+  }
 </ion-content>

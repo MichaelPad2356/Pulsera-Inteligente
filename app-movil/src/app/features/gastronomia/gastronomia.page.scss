@@ -1,0 +1,21 @@
+.intro {
+  color: var(--ion-color-medium);
+  margin-bottom: 0;
+}
+
+ion-card-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  ion-badge {
+    margin-left: auto;
+  }
+}
+
+.pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}

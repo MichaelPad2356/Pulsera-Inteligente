@@ -1,8 +1,9 @@
-import { Component, EnvironmentInjector, inject } from '@angular/core';
-import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { colorPalette, restaurant, musicalNotes, map, gift } from 'ionicons/icons';
+import { Component, inject } from '@angular/core';
+import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular';
 
+import { AvisosService } from '../core/services/avisos.service';
+
+/** Barra inferior con las 5 secciones del PDF. */
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
@@ -10,9 +11,8 @@ import { colorPalette, restaurant, musicalNotes, map, gift } from 'ionicons/icon
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
 })
 export class TabsPage {
-  public environmentInjector = inject(EnvironmentInjector);
-
   constructor() {
-    addIcons({ colorPalette, restaurant, musicalNotes, map, gift });
+    // Activa los avisos en vivo (visita registrada, promoción desbloqueada).
+    inject(AvisosService);
   }
 }

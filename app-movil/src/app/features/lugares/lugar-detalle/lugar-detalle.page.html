@@ -3,10 +3,68 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/mapa" text="" />
     </ion-buttons>
-    <ion-title>Lugar</ion-title>
+    <ion-title>{{ lugar()?.nombre ?? 'Lugar' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 2): nombre, categoría, descripción, horario, promociones, eventos/actividades del lugar y «Ver en el mapa». RF-03, RF-11.</p>
+<ion-content>
+  @if (lugar(); as lugar) {
+    @if (lugar.imagen) {
+      <img class="imagen-portada" [src]="lugar.imagen" [alt]="lugar.nombre" />
+    }
+    <div class="ion-padding">
+      @if (tipo(); as tipo) {
+        <ion-chip [style.--color]="tipo.color">
+          <ion-icon [name]="tipo.icono" />
+          <ion-label>{{ tipo.nombre }}</ion-label>
+        </ion-chip>
+      }
+      <h1>{{ lugar.nombre }}</h1>
+      <p>{{ lugar.descripcion }}</p>
+      <p class="dato"><ion-icon name="time-outline" /> {{ lugar.horario }}</p>
+      @if (distancia()) {
+        <p class="dato"><ion-icon name="navigate-outline" /> A {{ distancia() }} de ti</p>
+      }
+      <app-boton-mapa [lugarId]="lugar.id" texto="Ver en el mapa" />
+    </div>
+
+    @if (promociones().length) {
+      <ion-list-header><ion-label>Promociones</ion-label></ion-list-header>
+      @for (promocion of promociones(); track promocion.id) {
+        <app-tarjeta-promocion [promocion]="promocion" />
+      }
+    }
+
+    @if (eventos().length) {
+      <ion-list>
+        <ion-list-header><ion-label>Próximos eventos</ion-label></ion-list-header>
+        @for (evento of eventos(); track evento.id) {
+          <ion-item [routerLink]="['/tabs/conciertos/evento', evento.id]" detail>
+            <ion-label>
+              <h2>{{ evento.artista }}</h2>
+              <p>{{ evento.fecha | fechaCorta }} · {{ evento.hora }} h</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    @if (actividades().length) {
+      <ion-list>
+        <ion-list-header><ion-label>Actividades</ion-label></ion-list-header>
+        @for (actividad of actividades(); track actividad.id) {
+          <ion-item [routerLink]="['/tabs/cultura/actividad', actividad.id]" detail>
+            <ion-label>
+              <h2>{{ actividad.nombre }}</h2>
+              <p>{{ actividad.fecha | fechaCorta }} · {{ actividad.hora }} h</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  } @else if (cargando()) {
+    <div class="ion-text-center ion-padding"><ion-spinner /></div>
+  } @else {
+    <app-estado-vacio icono="alert-circle" mensaje="Este lugar ya no existe." />
+  }
 </ion-content>

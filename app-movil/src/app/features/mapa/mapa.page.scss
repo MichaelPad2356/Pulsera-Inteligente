@@ -1,0 +1,58 @@
+// Los estilos de los marcadores están en src/theme/mapa.scss (Leaflet los crea fuera de Angular).
+
+.mapa {
+  position: absolute;
+  inset: 0;
+}
+
+.chips {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 8px;
+  white-space: nowrap;
+
+  ion-chip {
+    flex: 0 0 auto;
+  }
+}
+
+.aviso {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 64px;
+  z-index: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--ion-color-warning);
+  color: var(--ion-color-warning-contrast);
+}
+
+.tarjeta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  max-height: 55%;
+  overflow-y: auto;
+
+  p {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 4px 0;
+  }
+
+  .promo-texto {
+    color: var(--ion-color-success);
+    font-weight: 500;
+  }
+
+  .acciones {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+}

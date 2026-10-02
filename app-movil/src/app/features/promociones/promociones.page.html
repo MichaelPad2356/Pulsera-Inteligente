@@ -5,13 +5,45 @@
       <app-boton-perfil />
     </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="seccion()" (ionChange)="seccion.set($any($event.detail.value))">
+      <ion-segment-button value="disponibles">
+        <ion-label>Disponibles</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="desbloqueadas">
+        <ion-label>
+          Desbloqueadas
+          @if (totalDesbloqueadas()) {
+            <ion-badge color="success">{{ totalDesbloqueadas() }}</ion-badge>
+          }
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="utilizadas">
+        <ion-label>Utilizadas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Promociones</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <p>Pendiente (semana 5): disponibles, desbloqueadas y utilizadas, con tu progreso. RF-08, RF-10.</p>
+<ion-content>
+  @if (sinPulsera()) {
+    <ion-card color="warning">
+      <ion-card-content>
+        <p><strong>Vincula tu pulsera</strong> para que tus visitas cuenten para las promociones.</p>
+        <ion-button size="small" fill="outline" routerLink="/perfil/vincular-pulsera">
+          <ion-icon slot="start" name="link-outline" /> Vincular pulsera
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  }
+
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding"><ion-spinner /></div>
+  } @else {
+    @for (promocion of visibles(); track promocion.id) {
+      <app-tarjeta-promocion [promocion]="promocion" />
+    } @empty {
+      <app-estado-vacio icono="gift-outline" [mensaje]="mensajeVacio()" />
+    }
+  }
 </ion-content>

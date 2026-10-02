@@ -1,0 +1,35 @@
+<ion-split-pane contentId="admin-contenido" when="md">
+  <ion-menu contentId="admin-contenido" menuId="admin">
+    <ion-header>
+      <ion-toolbar color="dark">
+        <ion-title>Panel administrativo</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list lines="none">
+        @for (s of secciones; track s.ruta) {
+          <ion-menu-toggle [autoHide]="false">
+            <ion-item
+              [routerLink]="s.ruta"
+              routerLinkActive="activa"
+              [routerLinkActiveOptions]="{ exact: !!s.exacta }"
+              routerDirection="root"
+              detail="false"
+            >
+              <ion-icon slot="start" [name]="s.icono" />
+              <ion-label>{{ s.texto }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        }
+        <ion-menu-toggle [autoHide]="false">
+          <ion-item routerLink="/tabs/conciertos" routerDirection="root" detail="false">
+            <ion-icon slot="start" name="exit-outline" />
+            <ion-label>Volver a la app</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+  <ion-router-outlet id="admin-contenido" />
+</ion-split-pane>

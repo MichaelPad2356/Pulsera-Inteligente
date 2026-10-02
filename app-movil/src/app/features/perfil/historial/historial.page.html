@@ -7,6 +7,37 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 4): visitas y canjes con lugar, fecha, hora y tipo. RF-09.</p>
+<ion-content>
+  @if (interacciones(); as interacciones) {
+    <ion-list>
+      @for (i of interacciones; track i.id) {
+        <ion-item>
+          @if (i.tipo === 'visita') {
+            <ion-icon slot="start" name="location" color="primary" />
+            <ion-label>
+              <h2>Visita · {{ nombreLugar(i.lugarId) }}</h2>
+              @if (i.eventoId && artista(i.eventoId)) {
+                <p>Evento: {{ artista(i.eventoId) }}</p>
+              }
+              <p>{{ i.fechaHora | momento }}</p>
+            </ion-label>
+          } @else {
+            <ion-icon slot="start" name="gift" color="success" />
+            <ion-label>
+              <h2>Canje · {{ tituloPromocion(i.promocionId ?? '') }}</h2>
+              <p>{{ nombreLugar(i.lugarId) }}</p>
+              <p>{{ i.fechaHora | momento }}</p>
+            </ion-label>
+          }
+        </ion-item>
+      } @empty {
+        <app-estado-vacio
+          icono="time-outline"
+          mensaje="Aún no tienes visitas. Pasa tu pulsera en los lectores de los establecimientos."
+        />
+      }
+    </ion-list>
+  } @else {
+    <div class="ion-text-center ion-padding"><ion-spinner /></div>
+  }
 </ion-content>

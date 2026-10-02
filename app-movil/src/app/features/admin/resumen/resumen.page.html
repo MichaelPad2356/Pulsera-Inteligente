@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button /></ion-buttons>
+    <ion-title>Resumen y estadísticas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (cargando()) {
+    <div class="ion-text-center"><ion-spinner /></div>
+  } @else {
+    <!-- Números principales -->
+    <section class="kpis">
+      <div class="tile heroe">
+        <span class="etiqueta">Visitas registradas</span>
+        <span class="valor">{{ totalVisitas() }}</span>
+        <span class="detalle">{{ visitasHoy() }} hoy</span>
+      </div>
+      <div class="tile">
+        <span class="etiqueta">Visitantes registrados</span>
+        <span class="valor">{{ visitantes() }}</span>
+      </div>
+      <div class="tile">
+        <span class="etiqueta">Pulseras vinculadas</span>
+        <span class="valor">{{ pulseras().vinculadas }}</span>
+        <span class="detalle">de {{ pulseras().total }} registradas</span>
+      </div>
+      <div class="tile">
+        <span class="etiqueta">Promociones desbloqueadas</span>
+        <span class="valor">{{ desbloqueadas() }}</span>
+      </div>
+      <div class="tile">
+        <span class="etiqueta">Promociones canjeadas</span>
+        <span class="valor">{{ canjeadas() }}</span>
+      </div>
+    </section>
+    @if (limiteAlcanzado()) {
+      <p class="nota">Las estadísticas de visitas consideran las 1,000 interacciones más recientes.</p>
+    }
+
+    <div class="graficas">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Lugares más visitados</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <app-grafica-barras [datos]="visitasPorLugar()" orientacion="horizontal" />
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Visitas por día (últimos 7 días)</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <app-grafica-barras [datos]="visitasPorDia()" orientacion="vertical" />
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Promociones</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th scope="col">Promoción</th>
+              <th scope="col">En progreso</th>
+              <th scope="col">Desbloqueadas</th>
+              <th scope="col">Canjeadas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of promociones(); track p.id) {
+              <tr [class.inactivo]="!p.activa">
+                <th scope="row">{{ p.titulo }}@if (!p.activa) { (inactiva) }</th>
+                <td>{{ p.enProgreso }}</td>
+                <td>{{ p.desbloqueadas }}</td>
+                <td>{{ p.canjeadas }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>

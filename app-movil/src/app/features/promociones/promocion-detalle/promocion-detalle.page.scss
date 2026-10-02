@@ -1,0 +1,15 @@
+.lugar,
+.estado {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.estado {
+  font-weight: 600;
+}
+
+.regla {
+  margin-top: 0;
+  font-weight: 500;
+}

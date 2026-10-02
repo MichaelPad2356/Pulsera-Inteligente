@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button /></ion-buttons>
+    <ion-title>Pulseras</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Código, UID o usuario" (ionInput)="busqueda.set($event.detail.value ?? '')" />
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <p class="ion-padding-horizontal">
+    {{ pulseras().length }} pulsera(s) · {{ vinculadas() }} vinculada(s).
+    Para registrar pulseras nuevas usa el lector en modo <strong>Alta</strong> (graba el enlace en el chip).
+  </p>
+
+  <ion-list>
+    @for (p of pulseras(); track p.id) {
+      <ion-item>
+        <ion-icon
+          slot="start"
+          [name]="p.estado === 'activa' ? 'watch-outline' : 'lock-closed-outline'"
+          [color]="p.estado === 'activa' ? 'primary' : 'danger'"
+        />
+        <ion-label>
+          <h2>{{ p.codigo }} @if (p.estado === 'bloqueada') { <ion-text color="danger">· Bloqueada</ion-text> }</h2>
+          <p>UID {{ p.id }}</p>
+          <p>{{ dueno(p.usuarioId) ?? 'Libre' }} @if (p.vinculadaEn) { · {{ p.vinculadaEn | momento }} }</p>
+        </ion-label>
+        @if (p.usuarioId) {
+          <ion-button slot="end" fill="clear" (click)="desvincular(p)" aria-label="Desvincular">
+            <ion-icon slot="icon-only" name="unlink-outline" />
+          </ion-button>
+        }
+        <ion-button
+          slot="end"
+          fill="clear"
+          [color]="p.estado === 'activa' ? 'danger' : 'success'"
+          (click)="alternarBloqueo(p)"
+          [attr.aria-label]="p.estado === 'activa' ? 'Bloquear' : 'Activar'"
+        >
+          <ion-icon slot="icon-only" [name]="p.estado === 'activa' ? 'lock-closed-outline' : 'lock-open-outline'" />
+        </ion-button>
+      </ion-item>
+    } @empty {
+      <ion-item><ion-label>No hay pulseras registradas.</ion-label></ion-item>
+    }
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header><ion-label>Alta manual (sin NFC)</ion-label></ion-list-header>
+    <ion-item>
+      <ion-input [(ngModel)]="uidNuevo" label="UID del chip" labelPlacement="floating" placeholder="04:A1:B2:C3:D4:E5:F6" />
+      <ion-button slot="end" (click)="registrarManual()">Registrar</ion-button>
+    </ion-item>
+    @if (mensaje()) {
+      <ion-item lines="none"><ion-note>{{ mensaje() }}</ion-note></ion-item>
+    }
+  </ion-list>
+</ion-content>

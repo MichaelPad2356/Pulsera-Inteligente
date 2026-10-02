@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/promociones" text="" />
+    </ion-buttons>
+    <ion-title>{{ esNueva() ? 'Nueva promoción' : 'Editar promoción' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <ion-input formControlName="titulo" label="Título (ej. 2x1 en tacos)" labelPlacement="floating" fill="outline" />
+    <ion-select formControlName="lugarId" label="Establecimiento que la otorga" labelPlacement="floating" fill="outline" interface="popover">
+      @for (l of lugares() ?? []; track l.id) {
+        <ion-select-option [value]="l.id">{{ l.nombre }}</ion-select-option>
+      }
+    </ion-select>
+    <ion-textarea formControlName="condiciones" label="Condiciones" labelPlacement="floating" fill="outline" [autoGrow]="true" />
+
+    <h3>Regla para desbloquearla</h3>
+    <ion-segment [value]="tipoRegla()" (ionChange)="elegirRegla($any($event.detail.value))">
+      <ion-segment-button value="cantidad"><ion-label>N.º de lugares</ion-label></ion-segment-button>
+      <ion-segment-button value="lugares"><ion-label>Lugares específicos</ion-label></ion-segment-button>
+      <ion-segment-button value="eventos"><ion-label>Eventos</ion-label></ion-segment-button>
+    </ion-segment>
+
+    @switch (tipoRegla()) {
+      @case ('cantidad') {
+        <p class="ayuda">Se desbloquea al visitar esa cantidad de lugares distintos (cualquiera con lector).</p>
+        <ion-input formControlName="meta" label="¿Cuántos lugares?" labelPlacement="floating" fill="outline" type="number" min="1" />
+      }
+      @case ('lugares') {
+        <p class="ayuda">Se desbloquea al visitar todos los lugares elegidos.</p>
+        <ion-select formControlName="lugaresIds" label="Lugares de la ruta" labelPlacement="floating" fill="outline" [multiple]="true">
+          @for (l of lugares() ?? []; track l.id) {
+            <ion-select-option [value]="l.id">{{ l.nombre }}</ion-select-option>
+          }
+        </ion-select>
+      }
+      @case ('eventos') {
+        <p class="ayuda">Se desbloquea al asistir a esa cantidad de eventos (pasar la pulsera en el foro el día del evento).</p>
+        <ion-input formControlName="meta" label="¿Cuántos eventos?" labelPlacement="floating" fill="outline" type="number" min="1" />
+      }
+    }
+
+    <h3>Vigencia</h3>
+    <div class="fila">
+      <ion-input formControlName="vigenciaInicio" label="Desde" labelPlacement="stacked" fill="outline" type="date" />
+      <ion-input formControlName="vigenciaFin" label="Hasta" labelPlacement="stacked" fill="outline" type="date" />
+    </div>
+
+    <ion-toggle formControlName="activa">Activa (si la desactivas deja de mostrarse)</ion-toggle>
+
+    @if (error()) {
+      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    }
+    <ion-button type="submit" expand="block" [disabled]="guardando()">
+      <ion-icon slot="start" name="save-outline" /> Guardar
+    </ion-button>
+  </form>
+</ion-content>

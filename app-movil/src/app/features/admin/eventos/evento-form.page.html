@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/eventos" text="" />
+    </ion-buttons>
+    <ion-title>{{ esNuevo() ? 'Nuevo evento' : 'Editar evento' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <ion-input formControlName="artista" label="Artista" labelPlacement="floating" fill="outline" />
+    <ion-textarea formControlName="descripcion" label="Descripción" labelPlacement="floating" fill="outline" [autoGrow]="true" />
+    <div class="fila">
+      <ion-input formControlName="fecha" label="Fecha" labelPlacement="stacked" fill="outline" type="date" />
+      <ion-input formControlName="hora" label="Hora" labelPlacement="stacked" fill="outline" type="time" />
+    </div>
+    <ion-select formControlName="lugarId" label="Foro" labelPlacement="floating" fill="outline" interface="popover">
+      @for (l of lugares(); track l.id) {
+        <ion-select-option [value]="l.id">{{ l.nombre }}</ion-select-option>
+      }
+    </ion-select>
+    <p class="ayuda">Los eventos en lugares que no son foro salen en «Otros eventos».</p>
+    <ion-input formControlName="imagen" label="URL de imagen (opcional)" labelPlacement="floating" fill="outline" type="url" />
+
+    @if (error()) {
+      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    }
+    <ion-button type="submit" expand="block" [disabled]="guardando()">
+      <ion-icon slot="start" name="save-outline" /> Guardar
+    </ion-button>
+  </form>
+</ion-content>

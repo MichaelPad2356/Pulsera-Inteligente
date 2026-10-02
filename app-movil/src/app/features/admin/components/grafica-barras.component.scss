@@ -1,0 +1,183 @@
+// Colores por rol (validados con la guía de visualización: contraste ≥ 3:1 en ambos modos).
+:host {
+  --serie: #2a78d6;
+  --rejilla: #e4e4e1;
+  --texto: var(--ion-text-color, #0b0b0b);
+  --texto-tenue: var(--ion-color-medium, #6b6b68);
+  --tooltip-fondo: #ffffff;
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --serie: #3987e5;
+    --rejilla: #333331;
+    --tooltip-fondo: #242423;
+  }
+}
+
+.grafica {
+  position: relative;
+}
+
+.alternar {
+  position: absolute;
+  top: -36px;
+  right: 0;
+  background: none;
+  border: none;
+  color: var(--ion-color-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.vacia {
+  color: var(--texto-tenue);
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  position: relative;
+  outline: none;
+  cursor: default;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--ion-color-primary);
+    border-radius: 4px;
+  }
+}
+
+.etiqueta {
+  color: var(--texto-tenue);
+  font-size: 0.85rem;
+}
+
+.valor {
+  color: var(--texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+// --- Barras horizontales (ranking) ---------------------------------------
+.horizontal li {
+  display: grid;
+  grid-template-columns: minmax(110px, 38%) 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0; // el área que responde al cursor es toda la fila, no solo la barra
+
+  .etiqueta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.pista {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 1px solid var(--rejilla); // línea base
+  min-height: 24px;
+}
+
+.barra {
+  display: block;
+  height: 16px; // ≤ 24px: barra delgada
+  min-width: 2px;
+  background: var(--serie);
+  border-radius: 0 4px 4px 0; // extremo de dato redondeado, base recta
+  transition: filter 0.15s;
+}
+
+// --- Columnas (tiempo) ---------------------------------------------------
+.vertical {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  border-bottom: 1px solid var(--rejilla); // línea base
+
+  li {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .area {
+    height: 160px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .columna {
+    display: block;
+    width: 20px; // ≤ 24px
+    min-height: 2px;
+    background: var(--serie);
+    border-radius: 4px 4px 0 0;
+    transition: filter 0.15s;
+  }
+
+  .etiqueta {
+    margin: 6px 0 2px;
+    text-align: center;
+  }
+}
+
+li.activa .barra,
+li.activa .columna {
+  filter: brightness(1.15);
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 10;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--texto);
+  background: var(--tooltip-fondo);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th,
+  td {
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--rejilla);
+    text-align: left;
+  }
+
+  td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  th {
+    font-weight: normal;
+  }
+
+  .tenue {
+    color: var(--texto-tenue);
+  }
+}

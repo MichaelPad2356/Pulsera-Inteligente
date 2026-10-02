@@ -1,0 +1,86 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--ion-color-light);
+
+  .etiqueta {
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+  }
+
+  .valor {
+    font-size: 1.9rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .detalle {
+    font-size: 0.8rem;
+    color: var(--ion-color-medium);
+  }
+
+  // La cifra principal del panel (solo una).
+  &.heroe {
+    grid-row: span 2;
+    justify-content: center;
+
+    .valor {
+      font-size: 3.5rem;
+    }
+  }
+}
+
+.nota {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+.graficas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin: 0 -10px; // las ion-card traen su propio margen
+
+  ion-card-content {
+    padding-top: 40px; // espacio para «Ver como tabla»
+  }
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th,
+  td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--ion-color-light-shade);
+  }
+
+  thead th {
+    font-weight: 600;
+    text-align: right;
+
+    &:first-child {
+      text-align: left;
+    }
+  }
+
+  tbody th {
+    font-weight: normal;
+    text-align: left;
+  }
+
+  td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}

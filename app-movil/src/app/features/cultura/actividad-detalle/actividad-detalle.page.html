@@ -7,6 +7,32 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 2): nombre, fecha, hora, descripción, lugar y botón «Ver ubicación». RF-02.</p>
+<ion-content class="ion-padding">
+  @if (actividad(); as actividad) {
+    <h1>{{ actividad.nombre }}</h1>
+    <p>{{ actividad.descripcion }}</p>
+
+    <ion-list lines="none">
+      <ion-item>
+        <ion-icon slot="start" name="calendar-outline" />
+        <ion-label>{{ actividad.fecha | fechaLarga }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon slot="start" name="time-outline" />
+        <ion-label>{{ actividad.hora }} h</ion-label>
+      </ion-item>
+      @if (lugar(); as lugar) {
+        <ion-item [routerLink]="['/tabs/cultura/lugar', lugar.id]" detail>
+          <ion-icon slot="start" name="location-outline" />
+          <ion-label>{{ lugar.nombre }}</ion-label>
+        </ion-item>
+      }
+    </ion-list>
+
+    <app-boton-mapa [lugarId]="actividad.lugarId" texto="Ver ubicación" />
+  } @else if (cargando()) {
+    <div class="ion-text-center"><ion-spinner /></div>
+  } @else {
+    <app-estado-vacio icono="alert-circle" mensaje="Esta actividad ya no existe." />
+  }
 </ion-content>

@@ -14,3 +14,7 @@ if (!window.matchMedia) {
       dispatchEvent: () => false,
     }) as MediaQueryList;
 }
+
+// Los íconos se registran al arrancar la app (AppComponent); en las pruebas, aquí.
+import { registrarIconos } from './app/core/iconos';
+registrarIconos();

@@ -5,13 +5,76 @@
       <app-boton-perfil />
     </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Buscar artista"
+      [value]="artista()"
+      (ionInput)="artista.set($event.detail.value ?? '')"
+      [debounce]="200"
+    />
+  </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Conciertos</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <p>Pendiente (semana 2): eventos por foro (Foro del Lago, Foro de las Estrellas, Palenque, otros) con filtros por fecha, artista y foro. RF-04.</p>
+<ion-content>
+  <!-- Filtro por fecha -->
+  <div class="chips">
+    <ion-chip [outline]="dia() !== TODOS" (click)="dia.set(TODOS)">
+      <ion-label>Todos los días</ion-label>
+    </ion-chip>
+    @for (d of dias(); track d) {
+      <ion-chip [outline]="dia() !== d" (click)="dia.set(d)">
+        <ion-label><strong>{{ nombreDia(d) }}</strong> {{ (d | fechaCorta).slice(4) }}</ion-label>
+      </ion-chip>
+    }
+  </div>
+
+  <!-- Filtro por foro -->
+  <ion-list lines="none" class="filtro-foro">
+    <ion-item>
+      <ion-select
+        label="Foro"
+        interface="popover"
+        [value]="foro()"
+        (ionChange)="foro.set($event.detail.value)"
+      >
+        <ion-select-option [value]="TODOS">Todos los foros</ion-select-option>
+        @for (f of foros(); track f.id) {
+          <ion-select-option [value]="f.id">{{ f.nombre }}</ion-select-option>
+        }
+        <ion-select-option [value]="OTROS">Otros eventos</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding"><ion-spinner /></div>
+  } @else {
+    @for (seccion of secciones(); track seccion.id) {
+      <ion-list>
+        <ion-list-header>
+          <ion-label>{{ seccion.titulo }}</ion-label>
+          @if (seccion.id !== OTROS) {
+            <app-boton-mapa [lugarId]="seccion.id" [compacto]="true" />
+          }
+        </ion-list-header>
+        @for (evento of seccion.eventos; track evento.id) {
+          <ion-item [routerLink]="['/tabs/conciertos/evento', evento.id]" detail>
+            <ion-label>
+              <h2>{{ evento.artista }}</h2>
+              <p>
+                <ion-icon name="calendar-outline" /> {{ evento.fecha | fechaCorta }} · {{ evento.hora }} h
+                @if (seccion.id === OTROS) {
+                  · {{ nombreLugar(evento.lugarId) }}
+                }
+              </p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @empty {
+      <app-estado-vacio icono="musical-notes" mensaje="No hay eventos con esos filtros.">
+        <ion-chip (click)="limpiarFiltros()"><ion-label>Quitar filtros</ion-label></ion-chip>
+      </app-estado-vacio>
+    }
+  }
 </ion-content>

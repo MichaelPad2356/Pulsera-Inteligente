@@ -1,0 +1,14 @@
+.chips {
+  display: flex;
+  overflow-x: auto;
+  padding: 8px 8px 0;
+  white-space: nowrap;
+
+  ion-chip {
+    flex: 0 0 auto;
+  }
+}
+
+.filtro-foro {
+  padding-top: 0;
+}

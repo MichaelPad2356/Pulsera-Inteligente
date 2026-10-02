@@ -7,6 +7,85 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 2): tus datos, tu pulsera, lugares visitados y cerrar sesión. RF-01, RF-08.</p>
+<ion-content>
+  <div class="cabecera">
+    <ion-icon name="person-circle-outline" />
+    <h1>{{ perfil()?.nombre }}</h1>
+    <p>{{ perfil()?.email }} · {{ rol() }}</p>
+  </div>
+
+  <!-- Pulsera (RF-01) -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-subtitle>Mi pulsera</ion-card-subtitle>
+      @if (pulsera(); as pulsera) {
+        <ion-card-title>{{ pulsera.codigo }}</ion-card-title>
+      } @else if (pulsera() === null) {
+        <ion-card-title>Sin vincular</ion-card-title>
+      }
+    </ion-card-header>
+    <ion-card-content>
+      @if (pulsera(); as pulsera) {
+        <p>
+          @if (pulsera.estado === 'activa') {
+            <ion-icon name="checkmark-circle" color="success" /> Activa
+          } @else {
+            <ion-icon name="warning" color="danger" /> Bloqueada
+          }
+          · vinculada {{ pulsera.vinculadaEn | momento }}
+        </p>
+        <ion-button fill="clear" size="small" routerLink="/perfil/vincular-pulsera">Cambiar de pulsera</ion-button>
+      } @else if (pulsera() === null) {
+        <p>Vincula tu pulsera para registrar tus visitas y desbloquear promociones.</p>
+        <ion-button routerLink="/perfil/vincular-pulsera">
+          <ion-icon slot="start" name="link-outline" /> Vincular pulsera
+        </ion-button>
+      }
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Resumen de visitas (RF-08: cuántos lugares, establecimientos o eventos ha visitado) -->
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <div class="dato"><strong>{{ historial.lugaresVisitados() }}</strong><span>lugares visitados</span></div>
+      </ion-col>
+      <ion-col size="6">
+        <div class="dato"><strong>{{ historial.eventosAsistidos() }}</strong><span>eventos</span></div>
+      </ion-col>
+      <ion-col size="6">
+        <div class="dato"><strong>{{ historial.totalVisitas() }}</strong><span>visitas registradas</span></div>
+      </ion-col>
+      <ion-col size="6">
+        <div class="dato"><strong>{{ historial.canjes() }}</strong><span>promociones usadas</span></div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-list>
+    <ion-item routerLink="/perfil/historial" detail>
+      <ion-icon slot="start" name="time-outline" />
+      <ion-label>Historial de visitas</ion-label>
+    </ion-item>
+    <ion-item routerLink="/tabs/promociones" detail>
+      <ion-icon slot="start" name="gift-outline" />
+      <ion-label>Mis promociones</ion-label>
+    </ion-item>
+    @if (esPersonal()) {
+      <ion-item routerLink="/establecimiento" detail>
+        <ion-icon slot="start" name="business-outline" />
+        <ion-label>Modo establecimiento (lector)</ion-label>
+      </ion-item>
+    }
+    @if (esAdmin()) {
+      <ion-item routerLink="/admin" detail>
+        <ion-icon slot="start" name="stats-chart-outline" />
+        <ion-label>Panel administrativo</ion-label>
+      </ion-item>
+    }
+    <ion-item button (click)="cerrarSesion()">
+      <ion-icon slot="start" name="log-out-outline" color="danger" />
+      <ion-label color="danger">Cerrar sesión</ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

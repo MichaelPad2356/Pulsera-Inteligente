@@ -7,6 +7,95 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 5): establecimiento, condiciones, vigencia, ubicación y progreso «3 de 5». RF-08, RF-10.</p>
+<ion-content class="ion-padding">
+  @if (promocion(); as promocion) {
+    <h1>{{ promocion.titulo }}</h1>
+    @if (lugar(); as lugar) {
+      <p class="lugar">
+        <ion-icon name="storefront" />
+        <a [routerLink]="['/tabs/promociones/lugar', lugar.id]">{{ lugar.nombre }}</a>
+      </p>
+    }
+
+    <!-- Estado y progreso (RF-10) -->
+    @switch (progreso()?.estado) {
+      @case ('desbloqueada') {
+        <ion-card color="success">
+          <ion-card-content>
+            <p class="estado"><ion-icon name="sparkles" /> ¡Desbloqueada {{ progreso()?.desbloqueadaEn | momento }}!</p>
+            <p>Pasa tu pulsera en {{ lugar()?.nombre }} para usarla.</p>
+          </ion-card-content>
+        </ion-card>
+      }
+      @case ('utilizada') {
+        <ion-card>
+          <ion-card-content>
+            <p class="estado"><ion-icon name="checkmark-done-outline" /> Utilizada {{ progreso()?.utilizadaEn | momento }}</p>
+          </ion-card-content>
+        </ion-card>
+      }
+      @default {
+        <ion-card>
+          <ion-card-content>
+            <p class="regla">{{ regla() }}</p>
+            <app-progreso-promocion [promocion]="promocion" [progreso]="progreso()" />
+          </ion-card-content>
+        </ion-card>
+      }
+    }
+
+    <ion-list lines="none">
+      <ion-item>
+        <ion-icon slot="start" name="information-circle-outline" />
+        <ion-label class="ion-text-wrap">
+          <h3>Condiciones</h3>
+          <p>{{ promocion.condiciones }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon slot="start" name="calendar-outline" />
+        <ion-label class="ion-text-wrap">
+          <h3>Vigencia</h3>
+          <p>Del {{ promocion.vigenciaInicio | fechaLarga }} al {{ promocion.vigenciaFin | fechaLarga }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Lugares de la ruta, con los ya visitados marcados -->
+    @if (ruta().length) {
+      <ion-list>
+        <ion-list-header><ion-label>Lugares de la ruta</ion-label></ion-list-header>
+        @for (paso of ruta(); track paso.id) {
+          <ion-item [routerLink]="['/tabs/promociones/lugar', paso.id]" detail>
+            <ion-icon
+              slot="start"
+              [name]="paso.visitado ? 'checkmark-circle' : 'ellipse-outline'"
+              [color]="paso.visitado ? 'success' : 'medium'"
+            />
+            <ion-label>{{ paso.nombre }}</ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    @if (proximosEventos().length) {
+      <ion-list>
+        <ion-list-header><ion-label>Próximos eventos</ion-label></ion-list-header>
+        @for (evento of proximosEventos(); track evento.id) {
+          <ion-item [routerLink]="['/tabs/conciertos/evento', evento.id]" detail>
+            <ion-label>
+              <h3>{{ evento.artista }}</h3>
+              <p>{{ evento.fecha | fechaCorta }} · {{ evento.hora }} h</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    <app-boton-mapa [lugarId]="promocion.lugarId" texto="Ver dónde se canjea" />
+  } @else if (cargando()) {
+    <div class="ion-text-center"><ion-spinner /></div>
+  } @else {
+    <app-estado-vacio icono="alert-circle" mensaje="Esta promoción ya no está disponible." />
+  }
 </ion-content>

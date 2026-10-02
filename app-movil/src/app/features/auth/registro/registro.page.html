@@ -7,6 +7,57 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 2): nombre, correo y contraseña; crea tu perfil único. RF-01.</p>
+<ion-content class="ion-padding">
+  <form [formGroup]="form" (ngSubmit)="registrar()">
+    <p>Con tu cuenta vinculas tu pulsera, acumulas visitas y desbloqueas promociones.</p>
+
+    <ion-input
+      formControlName="nombre"
+      label="Nombre"
+      labelPlacement="floating"
+      fill="outline"
+      autocomplete="name"
+      autocapitalize="words"
+    />
+    <ion-input
+      formControlName="email"
+      type="email"
+      label="Correo"
+      labelPlacement="floating"
+      fill="outline"
+      autocomplete="email"
+      inputmode="email"
+    />
+    <ion-input
+      formControlName="password"
+      type="password"
+      label="Contraseña (mínimo 6 caracteres)"
+      labelPlacement="floating"
+      fill="outline"
+      autocomplete="new-password"
+    >
+      <ion-input-password-toggle slot="end" />
+    </ion-input>
+    <ion-input
+      formControlName="confirmar"
+      type="password"
+      label="Confirmar contraseña"
+      labelPlacement="floating"
+      fill="outline"
+      autocomplete="new-password"
+    />
+
+    @if (error()) {
+      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    }
+
+    <ion-button expand="block" type="submit" [disabled]="enviando()">
+      {{ enviando() ? 'Creando cuenta…' : 'Crear cuenta' }}
+    </ion-button>
+  </form>
+
+  <p class="cambio">
+    ¿Ya tienes cuenta?
+    <a routerLink="/auth/login" [queryParams]="{ volver: volver() }">Inicia sesión</a>
+  </p>
 </ion-content>

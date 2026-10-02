@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button /></ion-buttons>
+    <ion-title>Promociones</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/admin/promociones/nueva">
+        <ion-icon slot="start" name="add-circle-outline" /> Nueva
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (promocion of promociones(); track promocion.id) {
+      <ion-item>
+        <ion-label [class.inactivo]="!promocion.activa">
+          <h2>{{ promocion.titulo }}</h2>
+          <p>{{ nombreLugar(promocion.lugarId) }} · {{ regla(promocion) }}</p>
+          <p>
+            Vigencia: {{ promocion.vigenciaInicio | fechaCorta }} – {{ promocion.vigenciaFin | fechaCorta }}
+            · {{ conteo(promocion.id).desbloqueadas }} desbloqueadas · {{ conteo(promocion.id).usadas }} canjeadas
+          </p>
+        </ion-label>
+        <ion-toggle
+          slot="end"
+          [checked]="promocion.activa"
+          (ionChange)="alternarActiva(promocion)"
+          aria-label="Activa"
+        />
+        <ion-button slot="end" fill="clear" [routerLink]="['/admin/promociones', promocion.id]" aria-label="Editar">
+          <ion-icon slot="icon-only" name="create-outline" />
+        </ion-button>
+      </ion-item>
+    } @empty {
+      <ion-item><ion-label>No hay promociones.</ion-label></ion-item>
+    }
+  </ion-list>
+</ion-content>

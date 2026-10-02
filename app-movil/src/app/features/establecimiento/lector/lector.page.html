@@ -1,9 +1,177 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
+<ion-header>
+  <ion-toolbar color="dark">
     <ion-title>Modo establecimiento</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/perfil" aria-label="Mi perfil">
+        <ion-icon slot="icon-only" name="person-circle-outline" />
+      </ion-button>
+      <ion-button (click)="cerrarSesion()" aria-label="Cerrar sesión">
+        <ion-icon slot="icon-only" name="log-out-outline" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="modo()" (ionChange)="cambiarModo($any($event.detail.value))">
+      <ion-segment-button value="visita"><ion-label>Visita</ion-label></ion-segment-button>
+      <ion-segment-button value="canje"><ion-label>Canje</ion-label></ion-segment-button>
+      @if (esAdmin()) {
+        <ion-segment-button value="alta"><ion-label>Alta</ion-label></ion-segment-button>
+      }
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 4–5): lee pulseras para registrar visitas (modo visita) o canjear promociones (modo canje). RF-07, RF-08.</p>
+<ion-content class="ion-padding">
+  <!-- En qué lugar está este lector -->
+  @if (esAdmin()) {
+    @if (modo() !== 'alta') {
+      <ion-list lines="none">
+        <ion-item>
+          <ion-select
+            label="Lugar"
+            placeholder="Elige el lugar"
+            interface="action-sheet"
+            [value]="lugarElegido()"
+            (ionChange)="lugarElegido.set($event.detail.value)"
+          >
+            @for (l of lugares() ?? []; track l.id) {
+              <ion-select-option [value]="l.id">{{ l.nombre }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      </ion-list>
+    }
+  } @else if (lugar(); as lugar) {
+    <p class="lugar"><ion-icon name="storefront" /> {{ lugar.nombre }}</p>
+  } @else {
+    <ion-text color="danger">
+      <p>Tu cuenta no tiene un lugar asignado. Pide al administrador que te asigne uno en el panel.</p>
+    </ion-text>
+  }
+
+  <!-- Zona de lectura -->
+  <div class="zona" [class.activa]="estadoNfc() === 'listo'" [class.alta]="modo() === 'alta'">
+    @if (procesando()) {
+      <ion-spinner />
+      <p>Procesando…</p>
+    } @else {
+      <ion-icon name="radio-outline" />
+      <h2>Acerca la pulsera</h2>
+      <p>
+        @switch (modo()) {
+          @case ('visita') { Para registrar la visita en este lugar. }
+          @case ('canje') { Para ver y canjear las promociones del visitante. }
+          @case ('alta') { Para grabar y registrar una pulsera nueva. Mantenla junto al teléfono. }
+        }
+      </p>
+    }
+  </div>
+
+  @if (estadoNfc() === 'apagado') {
+    <ion-button expand="block" color="warning" (click)="abrirAjustesNfc()">Activar NFC</ion-button>
+  } @else if (estadoNfc() === 'sin_nfc') {
+    <p class="nota">Este dispositivo no lee NFC. Puedes escribir el código impreso en la pulsera.</p>
+  }
+
+  <!-- Código manual (sin NFC o para pruebas) -->
+  @if (modo() !== 'alta') {
+    <form class="manual" (ngSubmit)="usarCodigo()">
+      <ion-input
+        [(ngModel)]="codigoEscrito"
+        name="codigo"
+        placeholder="Código de la pulsera"
+        fill="outline"
+        autocapitalize="characters"
+      />
+      <ion-button type="submit" [disabled]="procesando()">
+        <ion-icon slot="icon-only" name="keypad-outline" />
+      </ion-button>
+    </form>
+  }
+
+  <!-- Resultado de la última lectura -->
+  @if (resultado(); as r) {
+    @switch (r.tipo) {
+      @case ('visita') {
+        @if (r.datos.tipo === 'registrada') {
+          <ion-card color="success">
+            <ion-card-header>
+              <ion-card-title><ion-icon name="checkmark-circle" /> Visita registrada</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>¡Hola, {{ r.datos.nombre }}!</p>
+              @if (r.datos.evento) {
+                <p>Asistencia al evento: {{ r.datos.evento }}</p>
+              }
+              @for (c of r.datos.cambios; track c.promocionId) {
+                <p>
+                  @if (c.desbloqueada) {
+                    <ion-icon name="sparkles" /> <strong>¡Desbloqueó «{{ c.titulo }}»!</strong>
+                  } @else {
+                    {{ c.titulo }}: {{ c.avance }} de {{ c.meta }}
+                  }
+                </p>
+              }
+            </ion-card-content>
+          </ion-card>
+        } @else {
+          <ion-card color="warning">
+            <ion-card-content>
+              <p><strong>{{ r.datos.nombre }} ya registró su visita hoy aquí.</strong></p>
+              <p>Solo cuenta una visita por lugar al día.</p>
+            </ion-card-content>
+          </ion-card>
+        }
+      }
+      @case ('canje') {
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Promociones de {{ r.datos.nombre }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            @for (promo of r.datos.promociones; track promo.id) {
+              <div class="canje">
+                <span>{{ promo.titulo }}</span>
+                <ion-button size="small" color="success" [disabled]="procesando()" (click)="canjear(r.pulseraId, promo, r.datos.nombre)">
+                  Canjear
+                </ion-button>
+              </div>
+            } @empty {
+              <p>No tiene promociones desbloqueadas para canjear en este lugar.</p>
+            }
+          </ion-card-content>
+        </ion-card>
+      }
+      @case ('canjeada') {
+        <ion-card color="success">
+          <ion-card-content>
+            <p><ion-icon name="gift" /> <strong>«{{ r.titulo }}» canjeada.</strong></p>
+            <p>Entrega el beneficio a {{ r.nombre }}.</p>
+          </ion-card-content>
+        </ion-card>
+      }
+      @case ('alta') {
+        <ion-card [color]="r.grabada ? 'success' : 'warning'">
+          <ion-card-header>
+            <ion-card-title>Código {{ r.codigo }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{ r.nueva ? 'Pulsera nueva registrada.' : 'Esta pulsera ya estaba registrada.' }}</p>
+            <p>{{ r.grabada ? 'El enlace quedó grabado en el chip.' : 'No se pudo grabar el enlace; vuelve a acercarla.' }}</p>
+            @if (r.vinculada) {
+              <p>Ya está vinculada a un visitante.</p>
+            }
+            <p>Imprime o escribe el código <strong>{{ r.codigo }}</strong> en la pulsera.</p>
+          </ion-card-content>
+        </ion-card>
+      }
+      @case ('error') {
+        <ion-card color="danger">
+          <ion-card-content>
+            <p><ion-icon name="close-circle" /> {{ r.mensaje }}</p>
+          </ion-card-content>
+        </ion-card>
+      }
+    }
+  }
 </ion-content>

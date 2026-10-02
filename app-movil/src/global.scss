@@ -35,3 +35,17 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* --- Estilos propios de la app ------------------------------------------- */
+
+/* Imagen grande arriba de un detalle (lugar, evento). */
+.imagen-portada {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+}
+
+/* Elementos desactivados en las listas del panel. */
+.inactivo {
+  opacity: 0.5;
+}

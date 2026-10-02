@@ -7,6 +7,35 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <p>Pendiente (semana 2): artista, fecha, hora, foro, descripción y botón «Ir a ubicación». RF-04.</p>
+<ion-content class="ion-padding">
+  @if (evento(); as evento) {
+    @if (evento.imagen) {
+      <img class="imagen-portada" [src]="evento.imagen" [alt]="evento.artista" />
+    }
+    <h1>{{ evento.artista }}</h1>
+    <p>{{ evento.descripcion }}</p>
+
+    <ion-list lines="none">
+      <ion-item>
+        <ion-icon slot="start" name="calendar-outline" />
+        <ion-label>{{ evento.fecha | fechaLarga }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon slot="start" name="time-outline" />
+        <ion-label>{{ evento.hora }} h</ion-label>
+      </ion-item>
+      @if (foro(); as foro) {
+        <ion-item [routerLink]="['/tabs/conciertos/lugar', foro.id]" detail>
+          <ion-icon slot="start" name="musical-notes" />
+          <ion-label>{{ foro.nombre }}</ion-label>
+        </ion-item>
+      }
+    </ion-list>
+
+    <app-boton-mapa [lugarId]="evento.lugarId" texto="Ir a ubicación" />
+  } @else if (cargando()) {
+    <div class="ion-text-center"><ion-spinner /></div>
+  } @else {
+    <app-estado-vacio icono="alert-circle" mensaje="Este evento ya no existe." />
+  }
 </ion-content>

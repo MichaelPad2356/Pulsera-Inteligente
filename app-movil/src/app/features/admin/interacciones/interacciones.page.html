@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button /></ion-buttons>
+    <ion-title>Interacciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-select label="Tipo" interface="popover" [value]="tipo()" (ionChange)="tipo.set($event.detail.value)">
+        <ion-select-option [value]="TODOS">Todas</ion-select-option>
+        <ion-select-option value="visita">Visitas</ion-select-option>
+        <ion-select-option value="canje">Canjes</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-select label="Lugar" interface="popover" [value]="lugar()" (ionChange)="lugar.set($event.detail.value)">
+        <ion-select-option [value]="TODOS">Todos</ion-select-option>
+        @for (l of lugares() ?? []; track l.id) {
+          <ion-select-option [value]="l.id">{{ l.nombre }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding"><ion-spinner /></div>
+  } @else {
+    <p class="ion-padding-horizontal">{{ interacciones().length }} registro(s)</p>
+    <ion-list>
+      @for (i of interacciones(); track i.id) {
+        <ion-item>
+          <ion-icon slot="start" [name]="i.tipo === 'visita' ? 'location' : 'gift'" [color]="i.tipo === 'visita' ? 'primary' : 'success'" />
+          <ion-label>
+            <h2>{{ usuario(i.usuarioId) }} · {{ nombreLugar(i.lugarId) }}</h2>
+            <p>{{ i.fechaHora | momento }}</p>
+            @if (detalle(i.eventoId, i.promocionId); as texto) {
+              <p>{{ texto }}</p>
+            }
+          </ion-label>
+          <ion-note slot="end">{{ i.tipo === 'visita' ? 'Visita' : 'Canje' }}</ion-note>
+        </ion-item>
+      } @empty {
+        <ion-item><ion-label>No hay interacciones con esos filtros.</ion-label></ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>

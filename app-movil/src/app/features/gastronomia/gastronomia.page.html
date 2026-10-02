@@ -5,13 +5,52 @@
       <app-boton-perfil />
     </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="categoria()" (ionChange)="categoria.set($any($event.detail.value))" [scrollable]="true">
+      <ion-segment-button value="restaurante">
+        <ion-label>Restaurantes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="bar">
+        <ion-label>Bares</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="hecho_en_ags">
+        <ion-label>Hecho en Ags</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Gastronomía</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <p>Pendiente (semana 2): restaurantes, bares y Hecho en Aguascalientes. RF-03.</p>
+<ion-content>
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding"><ion-spinner /></div>
+  } @else {
+    @if (categoria() === 'hecho_en_ags') {
+      <p class="ion-padding-horizontal intro">Productos y sabores hechos en Aguascalientes.</p>
+    }
+    @for (lugar of establecimientos(); track lugar.id) {
+      <ion-card [routerLink]="['/tabs/gastronomia/lugar', lugar.id]" button>
+        @if (lugar.imagen) {
+          <img [src]="lugar.imagen" [alt]="lugar.nombre" />
+        }
+        <ion-card-header>
+          <ion-card-subtitle>
+            <ion-icon [name]="tipos[lugar.tipo].icono" /> {{ tipos[lugar.tipo].nombre }}
+            @if (numeroDePromociones(lugar.id); as total) {
+              <ion-badge color="success">{{ total }} {{ total === 1 ? 'promoción' : 'promociones' }}</ion-badge>
+            }
+          </ion-card-subtitle>
+          <ion-card-title>{{ lugar.nombre }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>{{ lugar.descripcion }}</p>
+          <div class="pie">
+            <span><ion-icon name="time-outline" /> {{ lugar.horario }}</span>
+            <app-boton-mapa [lugarId]="lugar.id" [compacto]="true" />
+          </div>
+        </ion-card-content>
+      </ion-card>
+    } @empty {
+      <app-estado-vacio icono="restaurant" mensaje="Aún no hay establecimientos en esta categoría." />
+    }
+  }
 </ion-content>

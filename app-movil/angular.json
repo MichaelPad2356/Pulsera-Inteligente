@@ -35,11 +35,16 @@
               "src/manifest.webmanifest"
             ],
             "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
               "src/global.scss",
-              "src/theme/variables.scss"
+              "src/theme/variables.scss",
+              "src/theme/mapa.scss"
             ],
             "scripts": [],
-            "browser": "src/main.ts"
+            "browser": "src/main.ts",
+            "allowedCommonJsDependencies": [
+              "leaflet"
+            ]
           },
           "configurations": {
             "production": {
@@ -51,8 +56,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "4kb",
+                  "maximumError": "8kb"
                 }
               ],
               "fileReplacements": [

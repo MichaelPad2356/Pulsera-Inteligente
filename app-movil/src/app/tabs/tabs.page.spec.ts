@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
+import { AvisosService } from '../core/services/avisos.service';
 import { TabsPage } from './tabs.page';
 
 describe('TabsPage', () => {
@@ -10,7 +11,8 @@ describe('TabsPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TabsPage],
-      providers: [provideRouter([])]
+      // Los avisos usan Firebase; en la prueba basta con un servicio vacío.
+      providers: [provideRouter([]), { provide: AvisosService, useValue: {} }],
     }).compileComponents();
   });
 

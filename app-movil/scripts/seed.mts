@@ -1,5 +1,8 @@
 // Carga datos de ejemplo en Firestore (solo para desarrollo y la demo).
 //   cd app-movil && npm run seed
+// Con las reglas de seguridad publicadas hay que entrar como admin:
+//   SEED_EMAIL=admin@correo.com SEED_PASSWORD=*** npm run seed     (bash)
+//   $env:SEED_EMAIL="admin@correo.com"; $env:SEED_PASSWORD="***"; npm run seed   (PowerShell)
 // Usa ids fijos: correrlo de nuevo sobrescribe estos documentos, no duplica.
 // Ojo: también pisa los cambios que se hayan hecho desde el panel a estos mismos ids.
 //
@@ -7,6 +10,7 @@
 // Las fechas son relativas: conciertos y actividades caen el próximo viernes, sábado y domingo.
 
 import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getFirestore, terminate, writeBatch } from 'firebase/firestore';
 
 import { firebaseConfig } from '../src/environments/firebase.config.ts';
@@ -14,6 +18,13 @@ import type { Actividad, Evento, Lugar, Promocion } from '../src/app/core/models
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+const { SEED_EMAIL, SEED_PASSWORD } = process.env;
+if (SEED_EMAIL && SEED_PASSWORD) {
+  await signInWithEmailAndPassword(auth, SEED_EMAIL, SEED_PASSWORD);
+  console.log(`Sesión iniciada como ${SEED_EMAIL}`);
+}
 
 // --- Fechas ---------------------------------------------------------------
 const ZONA = 'America/Mexico_City'; // Aguascalientes, sin horario de verano
@@ -69,9 +80,10 @@ const lugares: Record<string, Lugar> = {
     lng: -102.2988,
     activo: true,
   },
+  // Tipo 'otro': sus eventos salen en «Otros eventos» (RF-04).
   'teatro-pueblo': {
     nombre: 'Teatro del Pueblo',
-    tipo: 'foro',
+    tipo: 'otro',
     descripcion: 'Espectáculos familiares, grupos locales y bandas emergentes.',
     horario: '12:00 – 22:00',
     lat: 21.881,
@@ -343,4 +355,5 @@ for (const [coleccion, docs] of Object.entries(colecciones)) {
   console.log(`${coleccion}: ${Object.keys(docs).length}`);
 }
 console.log(`Conciertos y actividades: viernes ${VIE}, sábado ${SAB}, domingo ${DOM}`);
+if (auth.currentUser) await signOut(auth);
 await terminate(db);

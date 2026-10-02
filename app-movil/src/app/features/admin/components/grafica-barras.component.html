@@ -1,0 +1,67 @@
+<div class="grafica">
+  <button type="button" class="alternar" (click)="verTabla.set(!verTabla())">
+    {{ verTabla() ? 'Ver gráfica' : 'Ver como tabla' }}
+  </button>
+
+  @if (vacia()) {
+    <p class="vacia">Sin datos todavía.</p>
+  } @else if (verTabla()) {
+    <table>
+      <tbody>
+        @for (p of puntos(); track p.etiqueta) {
+          <tr>
+            <th scope="row">{{ p.etiqueta }}</th>
+            <td>{{ p.valor }}</td>
+            <td class="tenue">{{ p.participacion }}%</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else if (orientacion() === 'horizontal') {
+    <ul class="horizontal" role="list">
+      @for (p of puntos(); track p.etiqueta; let i = $index) {
+        <li
+          tabindex="0"
+          [attr.aria-label]="descripcion(p)"
+          [class.activa]="resaltado() === i"
+          (pointerenter)="resaltado.set(i)"
+          (pointerleave)="resaltado.set(null)"
+          (focus)="resaltado.set(i)"
+          (blur)="resaltado.set(null)"
+        >
+          <span class="etiqueta">{{ p.etiqueta }}</span>
+          <span class="pista">
+            <span class="barra" [style.width.%]="p.porcentaje"></span>
+            <span class="valor">{{ p.valor }}</span>
+          </span>
+          @if (resaltado() === i) {
+            <span class="tooltip" role="tooltip"><strong>{{ p.valor }} {{ unidad() }}</strong> · {{ p.participacion }}% del total</span>
+          }
+        </li>
+      }
+    </ul>
+  } @else {
+    <ul class="vertical" role="list">
+      @for (p of puntos(); track p.etiqueta; let i = $index) {
+        <li
+          tabindex="0"
+          [attr.aria-label]="descripcion(p)"
+          [class.activa]="resaltado() === i"
+          (pointerenter)="resaltado.set(i)"
+          (pointerleave)="resaltado.set(null)"
+          (focus)="resaltado.set(i)"
+          (blur)="resaltado.set(null)"
+        >
+          <span class="area">
+            <span class="valor">{{ p.valor }}</span>
+            <span class="columna" [style.height.%]="p.porcentaje"></span>
+          </span>
+          <span class="etiqueta">{{ p.etiqueta }}</span>
+          @if (resaltado() === i) {
+            <span class="tooltip" role="tooltip"><strong>{{ p.valor }} {{ unidad() }}</strong> · {{ p.etiqueta }}</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>
